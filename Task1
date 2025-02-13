@@ -1,0 +1,92 @@
+from pyspark.sql import SparkSession
+
+# Initialize the Spark session
+spark = SparkSession.builder \
+    .appName("Big Data Analysis with PySpark") \
+    .getOrCreate()
+
+# Load the dataset (assume it's a large CSV file)
+df = spark.read.csv("taxi_data.csv", header=True, inferSchema=True)
+
+# Display schema and first few rows
+df.printSchema()
+df.show(5)
+
+
+
+#---------------------------------------------------------------------------------------------------------------
+
+import dask.dataframe as dd
+
+# Load the dataset (assume it's a large CSV file)
+df = dd.read_csv('taxi_data.csv')
+
+# Display first few rows
+df.head()
+
+
+#---------------------------------------------------------------------------------------------------------------
+
+
+# # Data Processing
+
+# Drop rows with missing values
+df = df.dropna()
+
+# Convert columns to appropriate data types (e.g., trip_duration to int)
+df = df.withColumn("trip_duration", df["trip_duration"].cast("int"))
+
+# Show the first 5 rows after preprocessing
+df.show(5)
+
+
+#-----------------------------------------------------------------------------------------------------------------
+
+#DESK
+
+# # Drop rows with missing values
+# df = df.dropna()
+
+# # Convert columns to appropriate data types (e.g., trip_duration to int)
+# df['trip_duration'] = df['trip_duration'].astype('int')
+
+# # Display first few rows after preprocessing
+# df.head()
+
+
+
+# Count total number of trips
+total_trips = df.count()
+
+# Calculate average trip duration
+avg_trip_duration = df.agg({'trip_duration': 'avg'}).collect()[0][0]
+
+# Show the results
+print(f"Total Trips: {total_trips}")
+print(f"Average Trip Duration: {avg_trip_duration} minutes")
+
+# Example of filtering data (e.g., trips in a specific date range)
+filtered_df = df.filter(df['pickup_datetime'] >= '2023-01-01')
+
+# Show first few rows after filtering
+filtered_df.show(5)
+
+
+
+
+# Count total number of trips
+total_trips = df.shape[0].compute()
+
+# Calculate average trip duration
+avg_trip_duration = df['trip_duration'].mean().compute()
+
+# Show the results
+print(f"Total Trips: {total_trips}")
+print(f"Average Trip Duration: {avg_trip_duration} minutes")
+
+# Example of filtering data (e.g., trips after a specific date)
+filtered_df = df[df['pickup_datetime'] >= '2023-01-01']
+filtered_df.head()
+
+
+
